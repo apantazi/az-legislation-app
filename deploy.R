@@ -1,6 +1,11 @@
 #deploy.R
 library(rsconnect)
-rsconnect::setAccountInfo(name='apantazi', token='952FC967BB65520EDEA1B1AB01AB4061', secret='pR9ifsSx5ETRfd/EXnTqBfiW4qpkdb3wFQbOaAF+')
+cfg <- config::get()
+rsconnect::setAccountInfo(
+  name   = "apantazi",
+  token  = cfg$rsconnect_token,
+  secret = cfg$rsconnect_secret
+)
 
 server_files <- list.files("servers/", full.names = TRUE)
 
