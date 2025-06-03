@@ -1,0 +1,10 @@
+name: AZLegislativeCompass
+title:
+username: apantazi
+account: apantazi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14769735
+bundleId: 10313901
+url: https://apantazi.shinyapps.io/AZLegislativeCompass/
+version: 1
