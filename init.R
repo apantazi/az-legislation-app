@@ -28,11 +28,8 @@ cran_packages <- c(
 #  "shinyBS",
   "qs",
   "bsicons",
-"showtext"
+  "showtext"
 )
-library(showtext)
-font_add_google("Archivo", "Archivo")
-showtext_auto()
 
 # Install CRAN packages if needed
 install_if_needed(cran_packages)
@@ -48,3 +45,6 @@ install_if_needed(cran_packages)
 
 # Set conflicts preference to prioritize all dplyr functions
 conflicted::conflict_prefer_all("dplyr", quiet=TRUE)
+library(showtext)
+font_add_google("Archivo", "Archivo")
+showtext_auto()
