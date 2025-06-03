@@ -85,7 +85,6 @@ app02_leg_activity <- as.data.table(all_data$app02_leg_activity)
 #jct_bill_categories <- as.data.table(all_data$jct_bill_categories)
 app03_district_context <- as.data.table(all_data$app03_district_context)
 app03_district_context_state <- as.data.table(all_data$app03_district_context_state)
-app04_district_context <- as.data.table(all_data$app03_district_context)
 ########################
 #                      #  
 # User Interface       #
