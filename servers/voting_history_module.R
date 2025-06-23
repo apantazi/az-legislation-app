@@ -20,7 +20,10 @@ votingHistoryUI <- function(id) {
     
   )
 }
+
 votingHistoryServer <- function(id, selected_legislator) {
+  last_legislator <- reactiveVal(NULL)
+  
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     req(app02_leg_activity)
@@ -36,7 +39,8 @@ votingHistoryServer <- function(id, selected_legislator) {
     values <- reactiveValues(
       selectedYears = numeric(0),
       yearActive = list(),
-      selectedVoteTypes = c('Voted Against Both Parties', 'Voted With Opposing Party', 'Voted With Own Party')
+      selectedVoteTypes = c('Voted Against Both Parties', 'Voted With Opposing Party', 'Voted With Own Party'),
+      popupObservers = list()
     )
     
     observeEvent(available_years(), {
@@ -103,6 +107,11 @@ votingHistoryServer <- function(id, selected_legislator) {
       values$selectedVoteTypes <- input$voteType
     })
     
+    # Reset filter if legislator changes
+    observeEvent(selected_legislator(), {
+      last_legislator(selected_legislator())
+    }, ignoreInit = TRUE)
+    
     filtered_voting_data <- reactive({
       req(selected_legislator())
       
@@ -130,6 +139,7 @@ votingHistoryServer <- function(id, selected_legislator) {
           )
       }
       
+
       data
     })
     
@@ -183,7 +193,7 @@ votingHistoryServer <- function(id, selected_legislator) {
         data[start_index:end_index, ]
       }
     })
-    
+
     output$votesDisplay <- renderUI({
       data <- paginated_data()
       
@@ -210,12 +220,18 @@ votingHistoryServer <- function(id, selected_legislator) {
     })
     
     observe({
-      lapply(seq_len(nrow(paginated_data())), function(i) {
-        bill_data <- paginated_data()[i, ]
+      lapply(isolate(values$popupObservers), function(obs) {
+        if (!is.null(obs)) obs$destroy()
+      })
+      isolate(values$popupObservers <- list())
+      
+      data <- paginated_data()
+      lapply(seq_len(nrow(data)), function(i) {
+        bill_data <- data[i, ]
         bill_id <- gsub("[^A-Za-z0-9]", "", bill_data$bill_number)
         button_id <- sprintf('vote-details-link-%s', bill_id)
         
-        observeEvent(input[[button_id]], {
+        obs <- observeEvent(input[[button_id]], {
           rc_id <- bill_data$roll_call_id
           rc_votes <- app02_leg_activity[app02_leg_activity$roll_call_id == rc_id, ]
           
@@ -276,7 +292,9 @@ votingHistoryServer <- function(id, selected_legislator) {
             easyClose = TRUE,
             footer = modalButton("Close")
           ))
-        })
+        }, ignoreInit = TRUE)
+        
+        isolate(values$popupObservers[[button_id]] <- obs)
       })
     })
     

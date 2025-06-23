@@ -100,7 +100,7 @@ app01_vote_patterns <- dbGetQuery(con, "SELECT * FROM app_shiny.app01_vote_patte
 app02_leg_activity <- dbGetQuery(con, "SELECT * FROM app_shiny.app02_leg_activity")
 jct_bill_categories <- dbGetQuery(con, "SELECT * FROM proc.jct_bill_categories")
 app03_district_context <- dbGetQuery(con, "SELECT * FROM app_shiny.app03_district_context")
-app04_district_context <- dbGetQuery(con, "SELECT * FROM app_shiny.app03_district_context")
+#app04_district_context <- dbGetQuery(con, "SELECT * FROM app_shiny.app03_district_context")
 app03_district_context_state <- dbGetQuery(con, "SELECT * FROM app_shiny.app03_district_context_state")
 
 print("Data read to memory, disconnecting from database.")

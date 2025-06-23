@@ -9,7 +9,7 @@
 observeEvent(input$navbar_page == "app1", {
   #--- Is the user on mobile?
   is_mobile <- reactive({isTRUE(input$isMobile)})
-  observe({ print(input$isMobile); print(is_mobile())})
+  #observe({ print(input$isMobile); print(is_mobile())})
   
   #--- Filtering: one time, used everywhere downstream
   filtered_votes <- reactive({
@@ -172,6 +172,7 @@ observeEvent(input$navbar_page == "app1", {
     )
     y_labels_with_links <- setNames(
       paste('<a href="', labels_y$ballotpedia, '">', y_labels[as.character(labels_y$legislator_name)], '</a>', sep = ""),
+#      y_labels[as.character(labels_y$legislator_name)],
       labels_y$legislator_name
     )
     
@@ -192,7 +193,9 @@ observeEvent(input$navbar_page == "app1", {
     totalHeight <- 500 + numLegislators * 10
     totalWidth <- 500 + numBills * 10
     
-    p <- ggplot(data, aes(y = legislator_name, x = roll_call_id, fill = partisan_vote_plot, text = hover_text)) +
+    p <- ggplot(data, aes(y = legislator_name, x = roll_call_id, fill = partisan_vote_plot, text = hover_text
+                          #,key = legislator_name,customdata = roll_call_id
+                          )) +
       geom_tile(
         color = "white",
         linewidth = if (!is_mobile()) 0.5 else 0.2,
@@ -215,7 +218,25 @@ observeEvent(input$navbar_page == "app1", {
         plot.margin = margin(5, 5, 5, 5)
       )
     
-    plotly_output <- ggplotly(p, tooltip = "text", height = totalHeight, width = totalWidth) %>%
+    observeEvent(event_data("plotly_click", "leg-heatmap"), {
+      cd <- event_data("plotly_click", "leg-heatmap")
+      req(cd)
+      
+      ## factor levels that ggplot/plotly is using
+      leg_levels <- levels(data$legislator_name)   # rows (y-axis)
+      rc_levels  <- levels(data$roll_call_id)      # columns (x-axis)
+      
+      ## 1-based indices come from cd$y and cd$x
+      leg_val <- leg_levels[ cd$y ]                # 11  -> 11th name
+      rc_val  <- rc_levels[ cd$x ] 
+      
+      pending_selection$legislator <- leg_val
+      pending_selection$chamber    <- input$chamber
+      
+      updateTabsetPanel(session, "navbar_page", "app3")
+    })
+    
+    plotly_output <- plotly::event_register(p = ggplotly(p, tooltip = "text", height = totalHeight, width = totalWidth,source = "leg-heatmap") %>%
       layout(
         xaxis = list(side = "top"),
         font = list(family = "Archivo"),
@@ -224,10 +245,11 @@ observeEvent(input$navbar_page == "app1", {
         paper_bgcolor = "rgba(255,255,255,0.85)",
         dragmode = FALSE
       ) %>%
-      plotly::config(scrollZoom = FALSE, displayModeBar = FALSE)
+      plotly::config(scrollZoom = FALSE, displayModeBar = FALSE),event = "plotly_click")
 
     return(plotly_output)
   }) %>%   bindCache(input$party, input$chamber, input$year, input$final, input$sort_by_leg, input$sort_by_rc)
+  
 
   
   #--- Touch UI: scroll instructions

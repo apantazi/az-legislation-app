@@ -2,7 +2,8 @@ observeEvent(input$navbar_page == "app4", {
   
   
   filtered_data <- reactive({
-    data <- app04_district_context
+    data <- 
+      app03_district_context
     if (input$chamber4 != "All") {
       data <- data %>% filter(chamber == input$chamber4)
     }

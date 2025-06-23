@@ -101,13 +101,21 @@ source("ui.R", TRUE)
 # Handles server-side logic, including reactive expressions and observers, data queries and manipulations.
 # Generates outputs based on user inputs and updates the UI accordingly.
 
+pending_selection <- reactiveValues(legislator = NULL, chamber = NULL)
 
 #local = TRUE ensures each sourced file has access to input/output/session
 server <- function(input, output, session) {
+  observeEvent(input$go_tab, {
+    updateTabsetPanel(session, "navbar_page", selected = input$go_tab)
+  })
   source("servers/server1_vote_patterns.R", local = TRUE)
   source("servers/server3_district_context.R", local = TRUE)
   source("servers/server4_partisanship_scatterplot.R", local = TRUE)
+  source("servers/server0_about.R", local = TRUE)
+  aboutTabServer("about")  
 }
+
+
 
 ########################
 #                      #  

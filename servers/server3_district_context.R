@@ -135,14 +135,22 @@ observeEvent(input$navbar_page == "app3", {
       # --- Dynamic filter UI ---
       output$dynamicFilters3 <- renderUI({
         chambers <- unique(app03_district_context$chamber)
-        current_chamber <- if (!is.null(input$chamber3)) input$chamber3 else chambers[1]
+        current_chamber <- if (!is.null(pending_selection$chamber)) {
+          pending_selection$chamber
+        } else if (!is.null(input$chamber3)) {
+          input$chamber3
+        } else {
+          chambers[1]
+        }
         
         legis_filtered <- app03_district_context %>%
           filter(chamber == current_chamber) %>%
           arrange(legislator_name)
         sorted_legislators <- sort_legislators_by_last_name(legis_filtered$legislator_name)
         legis_choices <- setNames(sorted_legislators, legis_filtered$label[match(sorted_legislators, legis_filtered$legislator_name)])
-        current_legislator <- if (!is.null(input$legislator3) && input$legislator3 %in% sorted_legislators) {
+        current_legislator <- if (!is.null(pending_selection$legislator) && pending_selection$legislator %in% sorted_legislators) {
+          pending_selection$legislator
+        } else if (!is.null(input$legislator3) && input$legislator3 %in% sorted_legislators) {
           input$legislator3
         } else if (length(sorted_legislators) > 0) {
           sorted_legislators[1]
@@ -161,15 +169,7 @@ observeEvent(input$navbar_page == "app3", {
       })
       
       # --- Observers ---
-      observeEvent(input$chamber3, {
-        legis_filtered <- app03_district_context %>%
-          filter(chamber == input$chamber3) %>%
-          arrange(legislator_name)
-        sorted_legislators <- sort_legislators_by_last_name(legis_filtered$legislator_name)
-        legis_choices <- setNames(sorted_legislators, legis_filtered$label[match(sorted_legislators, legis_filtered$legislator_name)])
-        # Reset legislator to first one in the new chamber
-        updateSelectInput(session, "legislator3", choices = legis_choices, selected = sorted_legislators[1])
-      })
+
       
     
       # --- Main reactive to retrieve selected district's row ---

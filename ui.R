@@ -39,6 +39,20 @@ c_disconnect_message <- function() {
     refreshColour = "#f99a10" # Orange color for refresh button to grab attention
   )
 }
+#####################
+#                   #  
+# about tab    #
+#                   #
+##################### 
+aboutTabUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    # You can style this as needed
+    div(class = "about-section",
+        uiOutput(ns("aboutText"))
+    )
+  )
+}
 
 #####################
 #                   #  
@@ -112,6 +126,15 @@ c_disconnect_message <- function() {
 ###########################
 
 app3_ui <- tagList(
+  tags$head(
+    tags$script(HTML(
+      "
+    $(document).on('hidden.bs.modal', function () {
+      $('body').css('overflow', 'auto');
+    });
+    "
+    ))
+  ),
   column(12, uiOutput("dynamicHeader3")),
   column(12, uiOutput("dynamicFilters3")),
   column(12, uiOutput("dynamicContextComparison")),
@@ -202,8 +225,7 @@ ui <- fluidPage(
   ")),
   # Banner #####
   div(class = "banner",
-      tags$a(href = "https://jaxtrib.org/", 
-             HTML('        <svg width="650" height="180" viewBox="0 0 650 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      HTML('        <svg width="650" height="180" viewBox="0 0 650 180" fill="none" xmlns="http://www.w3.org/2000/svg">
           <text x="20" y="70" font-family="Archivo Black, Archivo, Arial Black, Arial, sans-serif" font-size="60" font-weight="bold" fill="white" letter-spacing="2">LEGISLATIVE</text>
           <text x="20" y="140" font-family="Archivo Black, Archivo, Arial Black, Arial, sans-serif" font-size="60" font-weight="bold" fill="white" letter-spacing="2">COMPASS</text>
           <g transform="translate(530,90)">
@@ -218,8 +240,10 @@ ui <- fluidPage(
             <circle cx="0" cy="0" r="10" fill="#1A2D49"/>
           </g>
         </svg>')
-      )
-  ),
+      ),
+  
+  
+
   
   #####################
   #                   #  
@@ -228,6 +252,8 @@ ui <- fluidPage(
   #####################
   div(class="navbar2",
       tabsetPanel(
+        tabPanel("About", value = "about", aboutTabUI("about")),
+        
         tabPanel("Voting Patterns", value = "app1", app1_ui),
         tabPanel("Legislator Lookup", value = "app3", app3_ui),
         tabPanel("Partisanship Scatterplot", value = "app4",app4_ui),

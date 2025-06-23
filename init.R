@@ -7,7 +7,6 @@ install_if_needed <- function(packages) {
 }
 
 # List of CRAN packages to install
-
 cran_packages <- c(
   "dplyr",
   "lubridate",
